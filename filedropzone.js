@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var uploadButton = document.getElementById('upload_btn');
     var fileListElement = document.getElementById('file_list');
     var files = [];
+    var imageCounter = 1;
 
     function updateFileList() {
         fileListElement.innerHTML = ''; // Clear the current list
@@ -37,6 +38,25 @@ document.addEventListener('DOMContentLoaded', function() {
         updateFileList(); // Update the list displayed on the page
     });
 
+    document.addEventListener('paste', function(e) {
+        var clipboardItems = e.clipboardData.items;
+        var newFiles = [];
+
+        for (var i = 0; i < clipboardItems.length; i++) {
+            var item = clipboardItems[i];
+            if (item.kind === 'file') {
+                var file = item.getAsFile();
+                var newFile = new File([file], `image ${imageCounter++}`, { type: file.type });
+                newFiles.push(newFile);
+            }
+        }
+
+        if (newFiles.length > 0) {
+            files = files.concat(newFiles);
+            updateFileList();
+        }
+    });
+
     uploadButton.addEventListener('click', function() {
         if (files.length === 0) {
             alert('No files to upload.');
@@ -52,5 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Clear the files array and list on the page after processing
         files = [];
         updateFileList();
+        imageCounter = 1; // Reset the image counter
     });
 });
